@@ -55,6 +55,7 @@ import static org.apache.kafka.streams.processor.internals.metrics.StreamsMetric
 import static org.apache.kafka.streams.processor.internals.metrics.StreamsMetricsImpl.RATE_SUFFIX;
 import static org.apache.kafka.streams.processor.internals.metrics.StreamsMetricsImpl.ROLLUP_VALUE;
 import static org.apache.kafka.streams.processor.internals.metrics.StreamsMetricsImpl.TOTAL_SUFFIX;
+import static org.apache.kafka.streams.processor.internals.metrics.StreamsMetricsImpl.PROCESSOR_NODE_ID_TAG;
 import static org.apache.kafka.streams.processor.internals.metrics.StreamsMetricsImpl.addAvgAndMaxLatencyToSensor;
 import static org.apache.kafka.streams.processor.internals.metrics.StreamsMetricsImpl.addInvocationRateAndCountToSensor;
 import static org.easymock.EasyMock.anyObject;
@@ -201,6 +202,78 @@ public class StreamsMetricsImplTest {
         final Sensor[] parents = {};
         expect(metrics.sensor(fullSensorName, recordingLevel, parents)).andReturn(sensor);
         replay(metrics);
+    }
+
+    @Test
+    public void shouldGetSameThreadLevelSensor() {
+        final Metrics metrics = mock(Metrics.class);
+        final RecordingLevel recordingLevel = RecordingLevel.INFO;
+        setupGetSensorTest(metrics, THREAD_ID, recordingLevel);
+
+        final StreamsMetricsImpl streamsMetrics = new StreamsMetricsImpl(metrics, CLIENT_ID, VERSION);
+
+        final Sensor preSensor = streamsMetrics.taskLevelSensor(THREAD_ID, TASK_ID, sensorName1, recordingLevel);
+        final Sensor afterSensor = streamsMetrics.taskLevelSensor(THREAD_ID, TASK_ID, sensorName1, recordingLevel);
+
+        final Sensor actualSensor = streamsMetrics.taskLevelSensor(THREAD_ID, TASK_ID, sensorName1, recordingLevel);
+
+        verify(metrics);
+        assertThat(actualSensor, is(equalToObject(sensor)));
+        assertThat(preSensor, is(equalToObject(afterSensor)));
+    }
+
+    @Test
+    public void shouldGetSameTaskLevelSensor() {
+        final Metrics metrics = mock(Metrics.class);
+        final RecordingLevel recordingLevel = RecordingLevel.INFO;
+        setupGetSensorTest(metrics, THREAD_ID, recordingLevel);
+
+        final StreamsMetricsImpl streamsMetrics = new StreamsMetricsImpl(metrics, CLIENT_ID, VERSION);
+
+        final Sensor preSensor = streamsMetrics.taskLevelSensor(THREAD_ID, TASK_ID, sensorName1, recordingLevel);
+        final Sensor afterSensor = streamsMetrics.taskLevelSensor(THREAD_ID, TASK_ID, sensorName1, recordingLevel);
+
+        final Sensor actualSensor = streamsMetrics.taskLevelSensor(THREAD_ID, TASK_ID, sensorName1, recordingLevel);
+
+        verify(metrics);
+        assertThat(actualSensor, is(equalToObject(sensor)));
+        assertThat(preSensor, is(equalToObject(afterSensor)));
+    }
+
+    @Test
+    public void shouldGetSameNodeLevelSensor() {
+        final Metrics metrics = mock(Metrics.class);
+        final RecordingLevel recordingLevel = RecordingLevel.INFO;
+        setupGetSensorTest(metrics, THREAD_ID, recordingLevel);
+
+        final StreamsMetricsImpl streamsMetrics = new StreamsMetricsImpl(metrics, CLIENT_ID, VERSION);
+
+        final Sensor preSensor = streamsMetrics.threadLevelSensor(THREAD_ID, sensorName2, recordingLevel);
+        final Sensor afterSensor = streamsMetrics.threadLevelSensor(THREAD_ID, sensorName2, recordingLevel);
+
+        final Sensor actualSensor = streamsMetrics.nodeLevelSensor(THREAD_ID, TASK_ID, PROCESSOR_NODE_ID_TAG, sensorName1, recordingLevel);
+
+        verify(metrics);
+        assertThat(actualSensor, is(equalToObject(sensor)));
+        assertThat(preSensor, is(equalToObject(afterSensor)));
+    }
+
+    @Test
+    public void shouldGetSameStoreLevelSensor() {
+        final Metrics metrics = mock(Metrics.class);
+        final RecordingLevel recordingLevel = RecordingLevel.INFO;
+        setupGetSensorTest(metrics, THREAD_ID, recordingLevel);
+
+        final StreamsMetricsImpl streamsMetrics = new StreamsMetricsImpl(metrics, CLIENT_ID, VERSION);
+
+        final Sensor preSensor = streamsMetrics.threadLevelSensor(THREAD_ID, sensorName2, recordingLevel);
+        final Sensor afterSensor = streamsMetrics.threadLevelSensor(THREAD_ID, sensorName2, recordingLevel);
+
+        final Sensor actualSensor = streamsMetrics.storeLevelSensor(THREAD_ID, TASK_ID, storeName, sensorName1, recordingLevel);
+
+        verify(metrics);
+        assertThat(actualSensor, is(equalToObject(sensor)));
+        assertThat(preSensor, is(equalToObject(afterSensor)));
     }
 
     @Test
