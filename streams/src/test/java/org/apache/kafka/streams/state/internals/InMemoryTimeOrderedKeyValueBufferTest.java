@@ -16,17 +16,46 @@
  */
 package org.apache.kafka.streams.state.internals;
 
+import org.apache.kafka.streams.state.StoreBuilder;
 import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class InMemoryTimeOrderedKeyValueBufferTest {
 
     @Test
     public void bufferShouldAllowCacheEnablement() {
-        new InMemoryTimeOrderedKeyValueBuffer.Builder<>(null, null, null).withCachingEnabled();
+        new InMemoryTimeOrderedKeyValueBuffer.Builder<>(null, null, null)
+            .withCachingEnabled();
     }
 
     @Test
     public void bufferShouldAllowCacheDisablement() {
-        new InMemoryTimeOrderedKeyValueBuffer.Builder<>(null, null, null).withCachingDisabled();
+        new InMemoryTimeOrderedKeyValueBuffer.Builder<>(null, null, null)
+            .withCachingDisabled();
+    }
+
+    @Test
+    public void bufferShouldAllowLoggingEnablement() {
+        final String expect = "3";
+        final Map<String, String> logConfig = new HashMap<>();
+        logConfig.put("min.insync.replicas", expect);
+        final StoreBuilder builder = new InMemoryTimeOrderedKeyValueBuffer.Builder<>(null, null, null)
+            .withLoggingEnabled(logConfig);
+
+        assertTrue(builder.logConfig().containsKey("min.insync.replicas"));
+        assertTrue(builder.logConfig().containsValue(expect));
+    }
+
+    @Test
+    public void bufferShouldAllowLoggingDisablement() {
+        final StoreBuilder builder = new InMemoryTimeOrderedKeyValueBuffer.Builder<>(null, null, null)
+            .withLoggingDisabled();
+
+        assertEquals(builder.logConfig(), new HashMap<>());
     }
 }

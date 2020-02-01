@@ -18,6 +18,7 @@ package org.apache.kafka.streams.kstream.internals.suppress;
 
 import org.apache.kafka.streams.kstream.Suppressed;
 
+import java.util.Map;
 import java.util.Objects;
 
 import static org.apache.kafka.streams.kstream.internals.suppress.BufferFullStrategy.SHUT_DOWN;
@@ -27,6 +28,16 @@ public class StrictBufferConfigImpl extends BufferConfigInternal<Suppressed.Stri
     private final long maxRecords;
     private final long maxBytes;
     private final BufferFullStrategy bufferFullStrategy;
+
+    public StrictBufferConfigImpl(final long maxRecords,
+                                  final long maxBytes,
+                                  final BufferFullStrategy bufferFullStrategy,
+                                  final Map<String, String> logConfig) {
+        super(logConfig);
+        this.maxRecords = maxRecords;
+        this.maxBytes = maxBytes;
+        this.bufferFullStrategy = bufferFullStrategy;
+    }
 
     public StrictBufferConfigImpl(final long maxRecords,
                                   final long maxBytes,
@@ -44,12 +55,22 @@ public class StrictBufferConfigImpl extends BufferConfigInternal<Suppressed.Stri
 
     @Override
     public Suppressed.StrictBufferConfig withMaxRecords(final long recordLimit) {
-        return new StrictBufferConfigImpl(recordLimit, maxBytes, bufferFullStrategy);
+        return new StrictBufferConfigImpl(recordLimit, maxBytes, bufferFullStrategy, logConfig);
     }
 
     @Override
     public Suppressed.StrictBufferConfig withMaxBytes(final long byteLimit) {
-        return new StrictBufferConfigImpl(maxRecords, byteLimit, bufferFullStrategy);
+        return new StrictBufferConfigImpl(maxRecords, byteLimit, bufferFullStrategy, logConfig);
+    }
+
+    @Override
+    public Suppressed.StrictBufferConfig withLoggingDisabled() {
+        return new StrictBufferConfigImpl(maxRecords, maxBytes, bufferFullStrategy, null);
+    }
+
+    @Override
+    public Suppressed.StrictBufferConfig withLoggingEnabled(final Map<String, String> config) {
+        return new StrictBufferConfigImpl(maxRecords, maxBytes, bufferFullStrategy, config);
     }
 
     @Override

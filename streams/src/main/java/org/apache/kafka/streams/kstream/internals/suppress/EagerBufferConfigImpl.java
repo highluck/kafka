@@ -18,6 +18,7 @@ package org.apache.kafka.streams.kstream.internals.suppress;
 
 import org.apache.kafka.streams.kstream.Suppressed;
 
+import java.util.Map;
 import java.util.Objects;
 
 public class EagerBufferConfigImpl extends BufferConfigInternal<Suppressed.EagerBufferConfig> implements Suppressed.EagerBufferConfig {
@@ -30,14 +31,22 @@ public class EagerBufferConfigImpl extends BufferConfigInternal<Suppressed.Eager
         this.maxBytes = maxBytes;
     }
 
+    public EagerBufferConfigImpl(final long maxRecords,
+                                 final long maxBytes,
+                                 final Map<String, String> logConfig) {
+        super(logConfig);
+        this.maxRecords = maxRecords;
+        this.maxBytes = maxBytes;
+    }
+
     @Override
     public Suppressed.EagerBufferConfig withMaxRecords(final long recordLimit) {
-        return new EagerBufferConfigImpl(recordLimit, maxBytes);
+        return new EagerBufferConfigImpl(recordLimit, maxBytes, logConfig);
     }
 
     @Override
     public Suppressed.EagerBufferConfig withMaxBytes(final long byteLimit) {
-        return new EagerBufferConfigImpl(maxRecords, byteLimit);
+        return new EagerBufferConfigImpl(maxRecords, byteLimit, logConfig);
     }
 
     @Override
@@ -53,6 +62,16 @@ public class EagerBufferConfigImpl extends BufferConfigInternal<Suppressed.Eager
     @Override
     public BufferFullStrategy bufferFullStrategy() {
         return BufferFullStrategy.EMIT;
+    }
+
+    @Override
+    public Suppressed.EagerBufferConfig withLoggingDisabled() {
+        return new EagerBufferConfigImpl(maxRecords, maxBytes, null);
+    }
+
+    @Override
+    public Suppressed.EagerBufferConfig withLoggingEnabled(final Map<String, String> config) {
+        return new EagerBufferConfigImpl(maxRecords, maxBytes, config);
     }
 
     @Override
