@@ -22,21 +22,22 @@ import org.junit.Test;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static java.util.Collections.emptyMap;
+import static java.util.Collections.singletonMap;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 
 public class InMemoryTimeOrderedKeyValueBufferTest {
 
     @Test
     public void bufferShouldAllowCacheEnablement() {
-        new InMemoryTimeOrderedKeyValueBuffer.Builder<>(null, null, null)
-            .withCachingEnabled();
+        new InMemoryTimeOrderedKeyValueBuffer.Builder<>(null, null, null).withCachingEnabled();
     }
 
     @Test
     public void bufferShouldAllowCacheDisablement() {
-        new InMemoryTimeOrderedKeyValueBuffer.Builder<>(null, null, null)
-            .withCachingDisabled();
+        new InMemoryTimeOrderedKeyValueBuffer.Builder<>(null, null, null).withCachingDisabled();
     }
 
     @Test
@@ -47,8 +48,8 @@ public class InMemoryTimeOrderedKeyValueBufferTest {
         final StoreBuilder builder = new InMemoryTimeOrderedKeyValueBuffer.Builder<>(null, null, null)
             .withLoggingEnabled(logConfig);
 
-        assertTrue(builder.logConfig().containsKey("min.insync.replicas"));
-        assertTrue(builder.logConfig().containsValue(expect));
+        assertThat(builder.logConfig(), is(singletonMap("min.insync.replicas", expect)));
+        assertThat(builder.loggingEnabled(), is(true));
     }
 
     @Test
@@ -56,6 +57,7 @@ public class InMemoryTimeOrderedKeyValueBufferTest {
         final StoreBuilder builder = new InMemoryTimeOrderedKeyValueBuffer.Builder<>(null, null, null)
             .withLoggingDisabled();
 
-        assertEquals(builder.logConfig(), new HashMap<>());
+        assertThat(builder.logConfig(), is(emptyMap()));
+        assertThat(builder.loggingEnabled(), is(false));
     }
 }
