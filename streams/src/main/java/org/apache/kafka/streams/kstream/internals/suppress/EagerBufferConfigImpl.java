@@ -18,6 +18,7 @@ package org.apache.kafka.streams.kstream.internals.suppress;
 
 import org.apache.kafka.streams.kstream.Suppressed;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
@@ -25,18 +26,20 @@ public class EagerBufferConfigImpl extends BufferConfigInternal<Suppressed.Eager
 
     private final long maxRecords;
     private final long maxBytes;
+    private final Map<String, String> logConfig;
 
     public EagerBufferConfigImpl(final long maxRecords, final long maxBytes) {
         this.maxRecords = maxRecords;
         this.maxBytes = maxBytes;
+        this.logConfig = Collections.emptyMap();
     }
 
-    public EagerBufferConfigImpl(final long maxRecords,
+    private EagerBufferConfigImpl(final long maxRecords,
                                  final long maxBytes,
                                  final Map<String, String> logConfig) {
-        super(logConfig);
         this.maxRecords = maxRecords;
         this.maxBytes = maxBytes;
+        this.logConfig = logConfig;
     }
 
     @Override
@@ -72,6 +75,16 @@ public class EagerBufferConfigImpl extends BufferConfigInternal<Suppressed.Eager
     @Override
     public Suppressed.EagerBufferConfig withLoggingEnabled(final Map<String, String> config) {
         return new EagerBufferConfigImpl(maxRecords, maxBytes, config);
+    }
+
+    @Override
+    public boolean isLoggingEnabled() {
+        return logConfig != null;
+    }
+
+    @Override
+    public Map<String, String> getLogConfig() {
+        return isLoggingEnabled() ? logConfig : Collections.emptyMap();
     }
 
     @Override

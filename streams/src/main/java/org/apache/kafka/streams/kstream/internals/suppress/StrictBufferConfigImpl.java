@@ -18,6 +18,7 @@ package org.apache.kafka.streams.kstream.internals.suppress;
 
 import org.apache.kafka.streams.kstream.Suppressed;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
@@ -28,15 +29,16 @@ public class StrictBufferConfigImpl extends BufferConfigInternal<Suppressed.Stri
     private final long maxRecords;
     private final long maxBytes;
     private final BufferFullStrategy bufferFullStrategy;
+    private final Map<String, String> logConfig;
 
     public StrictBufferConfigImpl(final long maxRecords,
                                   final long maxBytes,
                                   final BufferFullStrategy bufferFullStrategy,
                                   final Map<String, String> logConfig) {
-        super(logConfig);
         this.maxRecords = maxRecords;
         this.maxBytes = maxBytes;
         this.bufferFullStrategy = bufferFullStrategy;
+        this.logConfig = logConfig;
     }
 
     public StrictBufferConfigImpl(final long maxRecords,
@@ -45,12 +47,14 @@ public class StrictBufferConfigImpl extends BufferConfigInternal<Suppressed.Stri
         this.maxRecords = maxRecords;
         this.maxBytes = maxBytes;
         this.bufferFullStrategy = bufferFullStrategy;
+        this.logConfig = Collections.emptyMap();
     }
 
     public StrictBufferConfigImpl() {
         this.maxRecords = Long.MAX_VALUE;
         this.maxBytes = Long.MAX_VALUE;
         this.bufferFullStrategy = SHUT_DOWN;
+        this.logConfig = Collections.emptyMap();
     }
 
     @Override
@@ -86,6 +90,16 @@ public class StrictBufferConfigImpl extends BufferConfigInternal<Suppressed.Stri
     @Override
     public BufferFullStrategy bufferFullStrategy() {
         return bufferFullStrategy;
+    }
+
+    @Override
+    public boolean isLoggingEnabled() {
+        return logConfig != null;
+    }
+
+    @Override
+    public Map<String, String> getLogConfig() {
+        return isLoggingEnabled() ? logConfig : Collections.emptyMap();
     }
 
     @Override
