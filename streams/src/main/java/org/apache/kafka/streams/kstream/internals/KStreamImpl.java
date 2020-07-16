@@ -1433,4 +1433,14 @@ public class KStreamImpl<K, V> extends AbstractStream<K, V> implements KStream<K
 
         builder.addGraphNode(streamsGraphNode, processNode);
     }
+
+    @Override
+    public BranchedKStream<K, V> split() {
+        return null;
+    }
+
+    @Override
+    public BranchedKStream<K, V> split(Named n) {
+        return null;
+    }
 }

@@ -4014,4 +4014,8 @@ public interface KStream<K, V> {
     void process(final ProcessorSupplier<? super K, ? super V> processorSupplier,
                  final Named named,
                  final String... stateStoreNames);
+
+
+    BranchedKStream<K, V> split();
+    BranchedKStream<K, V> split(Named n);
 }
